@@ -23,22 +23,16 @@
                     </p>
                 </div>
 
-                <form method="POST" action="{{ route('guru.violations.store') }}" class="space-y-6">
+                <form method="POST" action="{{ route('guru.violations.store', ['student_id' => $selectedStudent->id]) }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     {{-- Siswa --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Siswa</label>
-                        <select name="student_id" required
-                            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                            <option value="">-- Pilih Siswa --</option>
-                            @foreach ($students as $student)
-                                <option value="{{ $student->id }}"
-                                    @selected(old('student_id', $selectedStudent) == $student->id)>
-                                    {{ $student->user?->name }} &mdash; Kelas {{ $student->class }} ({{ $student->major }})
-                                </option>
-                            @endforeach
-                        </select>
+                        <input type="hidden" name="student_id" value="{{ $selectedStudent->id }}">
+                        <div class="rounded-md border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                            {{ $selectedStudent->user?->name }} &mdash; Kelas {{ $selectedStudent->class }} ({{ $selectedStudent->major }})
+                        </div>
                         @error('student_id')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
                     </div>
 
@@ -90,6 +84,17 @@
                             placeholder="Deskripsi singkat mengenai kejadian pelanggaran..."
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm resize-none">{{ old('notes') }}</textarea>
                         @error('notes')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    {{-- Foto Bukti --}}
+                    <div>
+                        <label for="photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Foto Bukti <span class="text-gray-400 font-normal">(opsional, JPG/PNG/WEBP, maks. 5 MB)</span>
+                        </label>
+                        <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/webp"
+                            class="block w-full rounded-md border border-gray-300 bg-white text-sm text-gray-700 shadow-sm file:mr-4 file:rounded-l-md file:border-0 file:bg-gray-100 file:px-4 file:py-2.5 file:text-sm file:font-medium hover:file:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:file:bg-gray-600 dark:file:text-gray-100">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Unggah foto sebagai bukti kejadian pelanggaran.</p>
+                        @error('photo')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">

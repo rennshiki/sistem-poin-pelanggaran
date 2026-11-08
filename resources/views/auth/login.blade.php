@@ -7,7 +7,7 @@
 
         <!-- Username / NIP / NISN -->
         <div>
-            <x-input-label for="login" :value="__('Username / NIP / NISN')" />
+            <x-input-label for="login" :value="__('NIP / NISN')" />
 
             <x-text-input
                 id="login"

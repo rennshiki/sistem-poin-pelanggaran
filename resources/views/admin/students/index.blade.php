@@ -60,6 +60,7 @@
                                 <th class="px-6 py-4">Jurusan</th>
                                 <th class="px-6 py-4">No. HP Orang Tua</th>
                                 <th class="px-6 py-4">Status Akun</th>
+                                <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -98,10 +99,20 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a href="{{ route('admin.students.edit', $student) }}" class="rounded-lg bg-sky-100 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-200">Edit</a>
+                                            <form method="POST" action="{{ route('admin.students.destroy', $student) }}" data-confirm="{{ 'Hapus siswa ' . ($student->user?->name ?? '') . '? Data dan seluruh riwayat pelanggarannya juga akan dihapus.' }}" onsubmit="return confirm(this.dataset.confirm)">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="rounded-lg bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-200">Hapus</button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="8" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                         <div class="flex flex-col items-center justify-center">
                                             <svg class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>

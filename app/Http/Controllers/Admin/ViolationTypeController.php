@@ -19,7 +19,8 @@ class ViolationTypeController extends Controller
             ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
                 ->orWhere('description', 'like', "%{$search}%"))
             ->when($category, fn($q) => $q->where('category', $category))
-            ->latest()
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->paginate(10)
             ->withQueryString();
 

@@ -41,7 +41,7 @@ class DashboardController extends Controller
             default            => 'emerald',
         };
 
-        return view('siswa.dashboard', compact(
+        return view('students.dashboard', compact(
             'student',
             'totalPoints',
             'maxPoints',

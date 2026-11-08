@@ -8,17 +8,45 @@ use App\Models\Violation;
 use App\Models\ViolationType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ViolationController extends Controller
 {
+    public function students(Request $request): View
+    {
+        $search = $request->query('search');
+
+        $students = Student::with('user')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('nisn', 'like', "%{$search}%");
+                    })
+                    ->orWhere('class', 'like', "%{$search}%")
+                    ->orWhere('major', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('teachers.violations.students', compact('students', 'search'));
+    }
+
     public function create(Request $request): View
     {
-        $students       = Student::with('user')->get()->sortBy(fn($s) => $s->user?->name);
-        $violationTypes = ViolationType::active()->orderBy('category')->orderBy('name')->get();
-        $selectedStudent = $request->query('student_id');
+        $studentId = $request->query('student_id', old('student_id'));
+        if (! $studentId) {
+            return redirect()->route('guru.violations.students');
+        }
 
-        return view('guru.violations.create', compact('students', 'violationTypes', 'selectedStudent'));
+        $selectedStudent = Student::with('user')->findOrFail($studentId);
+        $violationTypes = ViolationType::active()->orderBy('category')->orderBy('name')->get();
+
+        return view('teachers.violations.create', compact('violationTypes', 'selectedStudent'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -34,9 +62,11 @@ class ViolationController extends Controller
             'violation_type_id' => ['required', 'exists:violation_types,id'],
             'violation_date'    => ['required', 'date', 'before_or_equal:today'],
             'notes'             => ['nullable', 'string', 'max:500'],
+            'photo'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $violationType = ViolationType::findOrFail($validated['violation_type_id']);
+        $photoPath = $request->file('photo')?->store('violation-photos', 'public');
 
         Violation::create([
             'student_id'        => $validated['student_id'],
@@ -44,6 +74,7 @@ class ViolationController extends Controller
             'violation_type_id' => $validated['violation_type_id'],
             'points'            => $violationType->points,
             'notes'             => $validated['notes'] ?? null,
+            'photo_path'        => $photoPath,
             'violation_date'    => $validated['violation_date'],
         ]);
 
@@ -66,7 +97,20 @@ class ViolationController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('guru.violations.index', compact('violations', 'search'));
+        return view('teachers.violations.index', compact('violations', 'search'));
+    }
+
+    public function photo(Violation $violation)
+    {
+        $teacher = auth()->user()->teacher;
+
+        if ($violation->teacher_id !== $teacher?->id) {
+            abort(403);
+        }
+
+        abort_unless($violation->photo_path && Storage::disk('public')->exists($violation->photo_path), 404);
+
+        return Storage::disk('public')->response($violation->photo_path);
     }
 
     public function destroy(Violation $violation): RedirectResponse
@@ -78,6 +122,9 @@ class ViolationController extends Controller
         }
 
         $violation->delete();
+        if ($violation->photo_path) {
+            Storage::disk('public')->delete($violation->photo_path);
+        }
 
         return back()->with('success', 'Catatan pelanggaran berhasil dihapus.');
     }

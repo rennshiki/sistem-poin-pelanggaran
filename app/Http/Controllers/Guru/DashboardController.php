@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
-use App\Models\ViolationType;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -44,15 +43,12 @@ class DashboardController extends Controller
                 ->get()
             : collect();
 
-        $violationTypes = ViolationType::active()->orderBy('name')->get();
-
-        return view('guru.dashboard', compact(
+        return view('teachers.dashboard', compact(
             'teacher',
             'totalViolationsAdded',
             'thisMonthCount',
             'students',
             'recentViolations',
-            'violationTypes',
         ));
     }
 }

@@ -26,16 +26,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return view('dashboard');
     })->name('dashboard');
 
-    Route::resource('teachers', \App\Http\Controllers\Admin\TeacherController::class)->only(['index', 'create', 'store']);
-    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->only(['index', 'create', 'store']);
+    Route::resource('teachers', \App\Http\Controllers\Admin\TeacherController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::resource('violation-types', \App\Http\Controllers\Admin\ViolationTypeController::class)->except(['show']);
 });
 
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/violations/students', [GuruViolationController::class, 'students'])->name('violations.students');
     Route::get('/violations/create', [GuruViolationController::class, 'create'])->name('violations.create');
     Route::post('/violations', [GuruViolationController::class, 'store'])->name('violations.store');
     Route::get('/violations', [GuruViolationController::class, 'index'])->name('violations.index');
+    Route::get('/violations/{violation}/photo', [GuruViolationController::class, 'photo'])->name('violations.photo');
     Route::delete('/violations/{violation}', [GuruViolationController::class, 'destroy'])->name('violations.destroy');
 });
 
@@ -45,7 +47,6 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

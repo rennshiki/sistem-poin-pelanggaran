@@ -22,7 +22,8 @@ class TeacherController extends Controller
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('nip', 'like', "%{$search}%");
             })
-            ->latest()
+            ->orderBy('created_at')
+            ->orderBy('id')
             ->paginate(10)
             ->withQueryString();
 
@@ -32,6 +33,13 @@ class TeacherController extends Controller
     public function create(): View
     {
         return view('admin.teachers.create');
+    }
+
+    public function edit(Teacher $teacher): View
+    {
+        $teacher->load('user');
+
+        return view('admin.teachers.create', compact('teacher'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -60,5 +68,57 @@ class TeacherController extends Controller
 
         return redirect()->route('admin.teachers.index')
             ->with('success', 'Data guru berhasil ditambahkan.');
+    }
+
+    public function update(Request $request, Teacher $teacher): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'nip' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('users', 'nip')->ignore($teacher->user_id),
+                Rule::unique('teachers', 'nip')->ignore($teacher->id),
+            ],
+            'password' => ['nullable', 'string', 'min:6'],
+        ]);
+
+        DB::transaction(function () use ($validated, $teacher) {
+            $teacher->update([
+                'name' => $validated['name'],
+                'nip' => $validated['nip'],
+            ]);
+
+            $userChanges = [
+                'name' => $validated['name'],
+                'nip' => $validated['nip'],
+            ];
+
+            if (! empty($validated['password'])) {
+                $userChanges['password'] = $validated['password'];
+            }
+
+            $teacher->user->update($userChanges);
+        });
+
+        return redirect()->route('admin.teachers.index')
+            ->with('success', 'Data guru berhasil diperbarui.');
+    }
+
+    public function destroy(Teacher $teacher): RedirectResponse
+    {
+        DB::transaction(function () use ($teacher) {
+            $user = $teacher->user;
+
+            if ($user) {
+                $user->delete();
+            } else {
+                $teacher->delete();
+            }
+        });
+
+        return redirect()->route('admin.teachers.index')
+            ->with('success', 'Data guru dan akun loginnya berhasil dihapus.');
     }
 }

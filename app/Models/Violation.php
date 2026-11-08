@@ -13,6 +13,7 @@ class Violation extends Model
         'violation_type_id',
         'points',
         'notes',
+        'photo_path',
         'violation_date',
     ];
 

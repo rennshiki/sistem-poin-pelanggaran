@@ -67,6 +67,7 @@
                                 <th class="px-6 py-4">Kategori</th>
                                 <th class="px-6 py-4">Poin</th>
                                 <th class="px-6 py-4">Catatan</th>
+                                <th class="px-6 py-4">Foto</th>
                                 <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -94,6 +95,13 @@
                                     <td class="px-6 py-4 text-xs text-gray-500 dark:text-gray-400 max-w-xs">
                                         <span class="line-clamp-2">{{ $v->notes ?: '-' }}</span>
                                     </td>
+                                    <td class="px-6 py-4">
+                                        @if ($v->photo_path)
+                                            <a href="{{ route('guru.violations.photo', $v) }}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Lihat foto</a>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 text-center">
                                         <form method="POST" action="{{ route('guru.violations.destroy', $v) }}"
                                               onsubmit="return confirm('Hapus catatan pelanggaran ini?')">
@@ -108,7 +116,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="9" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                         <p class="font-medium">Belum ada catatan pelanggaran</p>
                                     </td>
                                 </tr>

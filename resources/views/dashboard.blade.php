@@ -17,7 +17,7 @@
             </div>
 
             @if(Auth::user()->role === 'admin')
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <!-- Card Guru -->
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
                         <div>
@@ -60,6 +60,29 @@
                             </a>
                             <a href="{{ route('admin.students.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 Lihat Semua Siswa
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Card Manajemen Pelanggaran -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-rose-50 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5v14m0-14h12l-2 4 2 4H5m0 0h14l-2 4 2 4H5" />
+                                </svg>
+                            </div>
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white">Manajemen Data Pelanggaran</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Kelola jenis pelanggaran, kategori, jumlah poin, dan status pelanggaran yang dapat dicatat guru.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex flex-wrap items-center gap-3">
+                            <a href="{{ route('admin.violation-types.create') }}" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+                                + Tambah Pelanggaran
+                            </a>
+                            <a href="{{ route('admin.violation-types.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                Lihat Semua Pelanggaran
                             </a>
                         </div>
                     </div>
