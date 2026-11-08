@@ -13,37 +13,37 @@
                     </header>
 
                     <dl class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div class="rounded-2xl bg-amber-50 p-4">
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Nama</dt>
-                            <dd class="mt-1 font-semibold text-stone-900">{{ $user->name }}</dd>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Nama</dt>
+                            <dd class="mt-1 font-semibold text-slate-900">{{ $user->name }}</dd>
                         </div>
-                        <div class="rounded-2xl bg-teal-50 p-4">
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-teal-700">Peran</dt>
-                            <dd class="mt-1 font-semibold capitalize text-stone-900">{{ $user->role }}</dd>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Peran</dt>
+                            <dd class="mt-1 font-semibold capitalize text-slate-900">{{ $user->role }}</dd>
                         </div>
 
                         @if ($user->nip)
-                            <div class="rounded-2xl bg-sky-50 p-4">
-                                <dt class="text-xs font-semibold uppercase tracking-wide text-sky-700">NIP</dt>
-                                <dd class="mt-1 font-mono font-semibold text-stone-900">{{ $user->nip }}</dd>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">NIP</dt>
+                                <dd class="mt-1 font-mono font-semibold text-slate-900">{{ $user->nip }}</dd>
                             </div>
                         @endif
 
                         @if ($user->nisn)
-                            <div class="rounded-2xl bg-rose-50 p-4">
-                                <dt class="text-xs font-semibold uppercase tracking-wide text-rose-700">NISN</dt>
-                                <dd class="mt-1 font-mono font-semibold text-stone-900">{{ $user->nisn }}</dd>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">NISN</dt>
+                                <dd class="mt-1 font-mono font-semibold text-slate-900">{{ $user->nisn }}</dd>
                             </div>
                         @endif
 
                         @if ($user->student)
-                            <div class="rounded-2xl bg-violet-50 p-4">
-                                <dt class="text-xs font-semibold uppercase tracking-wide text-violet-700">Kelas</dt>
-                                <dd class="mt-1 font-semibold text-stone-900">{{ $user->student->class }}</dd>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Kelas</dt>
+                                <dd class="mt-1 font-semibold text-slate-900">{{ $user->student->class }}</dd>
                             </div>
-                            <div class="rounded-2xl bg-orange-50 p-4">
-                                <dt class="text-xs font-semibold uppercase tracking-wide text-orange-700">Jurusan</dt>
-                                <dd class="mt-1 font-semibold text-stone-900">{{ $user->student->major }}</dd>
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan</dt>
+                                <dd class="mt-1 font-semibold text-slate-900">{{ $user->student->major }}</dd>
                             </div>
                         @endif
                     </dl>
@@ -56,11 +56,6 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
         </div>
     </div>
 </x-app-layout>

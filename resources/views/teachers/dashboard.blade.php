@@ -20,42 +20,42 @@
 
             {{-- Stat Cards --}}
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-6 text-white shadow-lg">
+                <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
                     <div class="flex items-center justify-between gap-4">
                         <div>
-                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-white/85">Total Pelanggaran Dicatat</p>
-                            <p class="mt-2 text-4xl font-black">{{ $totalViolationsAdded }}</p>
-                            <p class="mt-1 text-sm text-white/85">Sepanjang waktu</p>
+                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Total Pelanggaran Dicatat</p>
+                            <p class="mt-2 text-4xl font-black text-slate-900">{{ $totalViolationsAdded }}</p>
+                            <p class="mt-1 text-sm text-slate-500">Sepanjang waktu</p>
                         </div>
-                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/20">
+                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
                             <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5h6m-7 3h8m-9 4h10m-9 4h8M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z" />
                             </svg>
                         </span>
                     </div>
                 </div>
-                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-500 to-red-500 p-6 text-white shadow-lg">
+                <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
                     <div class="flex items-center justify-between gap-4">
                         <div>
-                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-white/85">Bulan Ini</p>
-                            <p class="mt-2 text-4xl font-black">{{ $thisMonthCount }}</p>
-                            <p class="mt-1 text-sm text-white/85">Pelanggaran tercatat</p>
+                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Bulan Ini</p>
+                            <p class="mt-2 text-4xl font-black text-slate-900">{{ $thisMonthCount }}</p>
+                            <p class="mt-1 text-sm text-slate-500">Pelanggaran tercatat</p>
                         </div>
-                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/20">
+                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
                             <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />
                             </svg>
                         </span>
                     </div>
                 </div>
-                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 p-6 text-white shadow-lg sm:col-span-2 xl:col-span-1">
+                <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm sm:col-span-2 xl:col-span-1">
                     <div class="flex items-center justify-between gap-4">
                         <div>
-                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-white/85">Total Siswa</p>
-                            <p class="mt-2 text-4xl font-black">{{ $students->count() }}</p>
-                            <p class="mt-1 text-sm text-white/85">Siswa terdaftar</p>
+                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Total Siswa</p>
+                            <p class="mt-2 text-4xl font-black text-slate-900">{{ $students->count() }}</p>
+                            <p class="mt-1 text-sm text-slate-500">Siswa terdaftar</p>
                         </div>
-                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/20">
+                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
                             <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2m6-10a4 4 0 110-8 4 4 0 010 8zm10 10v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
                             </svg>

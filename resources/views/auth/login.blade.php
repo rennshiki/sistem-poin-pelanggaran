@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-8">
+        <p class="text-sm font-semibold text-blue-600">Selamat datang kembali</p>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Masuk ke akun</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-500">Masukkan NIP atau NISN dan kata sandi untuk melanjutkan.</p>
+    </div>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -11,7 +16,7 @@
 
             <x-text-input
                 id="login"
-                class="block mt-1 w-full"
+                class="mt-2 block w-full"
                 type="text"
                 name="login"
                 :value="old('login')"
@@ -25,11 +30,11 @@
 
         <!-- Password -->
         <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <x-input-label for="password" value="Kata sandi" />
 
             <x-text-input
                 id="password"
-                class="block mt-1 w-full"
+                class="mt-2 block w-full"
                 type="password"
                 name="password"
                 required
@@ -45,19 +50,19 @@
                 <input
                     id="remember_me"
                     type="checkbox"
-                    class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                    class="rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500"
                     name="remember"
                 >
 
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('Remember me') }}
+                <span class="ms-2 text-sm text-slate-600">
+                    Ingat saya
                 </span>
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
+        <div class="mt-7">
+            <x-primary-button class="w-full justify-center py-3 text-sm normal-case tracking-normal">
+                Masuk
             </x-primary-button>
         </div>
     </form>

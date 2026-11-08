@@ -7,10 +7,62 @@
 }
 
 @layer base {
+    body {
+        font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+
     h1,
     h2,
     h3 {
-        font-family: Georgia, 'Times New Roman', serif;
-        letter-spacing: -0.02em;
+        font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+        letter-spacing: -0.025em;
+    }
+
+    input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    select,
+    textarea {
+        border-radius: 0.625rem;
+        border-color: #cbd5e1;
+        background-color: #fff;
+        color: #0f172a;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        --tw-ring-color: #3b82f6;
+        border-color: #3b82f6;
+    }
+
+    button,
+    a {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+@layer components {
+    .app-content {
+        color: #334155;
+    }
+
+    .app-content .bg-white {
+        border-color: #e2e8f0;
+        box-shadow: 0 1px 3px rgb(15 23 42 / 0.05);
+    }
+
+    .app-content table thead {
+        background-color: #f8fafc;
+    }
+
+    .app-content table th {
+        letter-spacing: 0.06em;
+    }
+
+    .app-content a:focus-visible,
+    .app-content button:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
     }
 }
