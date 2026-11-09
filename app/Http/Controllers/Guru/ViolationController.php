@@ -59,20 +59,30 @@ class ViolationController extends Controller
 
         $validated = $request->validate([
             'student_id'        => ['required', 'exists:students,id'],
+            'category'          => ['required', 'in:ringan,sedang,berat'],
             'violation_type_id' => ['required', 'exists:violation_types,id'],
             'violation_date'    => ['required', 'date', 'before_or_equal:today'],
             'notes'             => ['nullable', 'string', 'max:500'],
             'photo'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        $violationType = ViolationType::findOrFail($validated['violation_type_id']);
+        $violationType = ViolationType::active()
+            ->where('category', $validated['category'])
+            ->find($validated['violation_type_id']);
+
+        if (! $violationType) {
+            return back()->withErrors([
+                'violation_type_id' => 'Pilih pelanggaran yang sesuai dengan kategori.',
+            ])->withInput();
+        }
+
         $photoPath = $request->file('photo')?->store('violation-photos', 'public');
 
         Violation::create([
             'student_id'        => $validated['student_id'],
             'teacher_id'        => $teacher->id,
             'violation_type_id' => $validated['violation_type_id'],
-            'points'            => $violationType->points,
+            'points'            => ViolationType::pointsForCategory($violationType->category),
             'notes'             => $validated['notes'] ?? null,
             'photo_path'        => $photoPath,
             'violation_date'    => $validated['violation_date'],

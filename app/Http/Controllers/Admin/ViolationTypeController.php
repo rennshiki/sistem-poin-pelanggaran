@@ -37,12 +37,12 @@ class ViolationTypeController extends Controller
         $validated = $request->validate([
             'name'        => ['required', 'string', 'max:255', 'unique:violation_types,name'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'points'      => ['required', 'integer', 'min:1', 'max:100'],
             'category'    => ['required', 'in:ringan,sedang,berat'],
             'is_active'   => ['boolean'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['points'] = ViolationType::pointsForCategory($validated['category']);
 
         ViolationType::create($validated);
 
@@ -60,12 +60,12 @@ class ViolationTypeController extends Controller
         $validated = $request->validate([
             'name'        => ['required', 'string', 'max:255', 'unique:violation_types,name,' . $violationType->id],
             'description' => ['nullable', 'string', 'max:1000'],
-            'points'      => ['required', 'integer', 'min:1', 'max:100'],
             'category'    => ['required', 'in:ringan,sedang,berat'],
             'is_active'   => ['boolean'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['points'] = ViolationType::pointsForCategory($validated['category']);
 
         $violationType->update($validated);
 

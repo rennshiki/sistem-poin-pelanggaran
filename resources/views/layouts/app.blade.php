@@ -15,9 +15,9 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ sidebarOpen: false, logoutPromptOpen: false }" class="min-h-screen bg-slate-100 p-0 text-slate-900 md:p-4 lg:p-6">
-            <div class="mx-auto min-h-screen max-w-[1800px] overflow-hidden bg-white shadow-sm ring-1 ring-slate-200 md:min-h-[calc(100vh-2rem)] md:rounded-2xl lg:min-h-[calc(100vh-3rem)] lg:rounded-3xl">
-                <div class="flex min-h-screen flex-col md:min-h-[calc(100vh-3rem)]">
+        <div x-data="{ sidebarOpen: false, logoutPromptOpen: false }" class="min-h-screen bg-slate-50 p-0 text-slate-900">
+            <div class="min-h-screen w-full overflow-hidden bg-white">
+                <div class="flex min-h-screen flex-col">
                     <div class="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
                         <span class="text-lg font-bold tracking-tight text-slate-900">Poin Siswa</span>
                         <button type="button" @click="sidebarOpen = !sidebarOpen"

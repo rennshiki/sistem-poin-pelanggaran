@@ -103,15 +103,42 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <form method="POST" action="{{ route('guru.violations.destroy', $v) }}"
-                                              onsubmit="return confirm('Hapus catatan pelanggaran ini?')">
+                                        <div x-data="{ deletePromptOpen: false }">
+                                            <form id="delete-violation-{{ $v->id }}" method="POST" action="{{ route('guru.violations.destroy', $v) }}" class="hidden">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-300 rounded-md transition">
+                                            </form>
+                                            <button type="button" @click="deletePromptOpen = true"
+                                                class="inline-flex items-center rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-300">
                                                 Hapus
                                             </button>
-                                        </form>
+                                            <div x-cloak x-show="deletePromptOpen" x-transition.opacity
+                                                @keydown.escape.window="deletePromptOpen = false"
+                                                class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/45 p-4 text-left"
+                                                role="presentation">
+                                                <div @click.outside="deletePromptOpen = false" @click.stop
+                                                    class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200"
+                                                    role="dialog" aria-modal="true" aria-labelledby="delete-violation-title-{{ $v->id }}">
+                                                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
+                                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 7h12m-10 0V5h8v2m-7 0 1 12h4l1-12M10 11v5m4-5v5" />
+                                                        </svg>
+                                                    </div>
+                                                    <h3 id="delete-violation-title-{{ $v->id }}" class="mt-4 text-lg font-bold text-slate-900">Hapus catatan pelanggaran?</h3>
+                                                    <p class="mt-2 text-sm leading-6 text-slate-600">Catatan untuk {{ $v->student->user?->name }} akan dihapus dan poinnya dikurangi dari akumulasi siswa.</p>
+                                                    <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                                                        <button type="button" @click="deletePromptOpen = false"
+                                                            class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                            Batal
+                                                        </button>
+                                                        <button type="submit" form="delete-violation-{{ $v->id }}"
+                                                            class="rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2">
+                                                            Ya, hapus
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

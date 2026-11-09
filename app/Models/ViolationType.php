@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class ViolationType extends Model
 {
+    public const CATEGORY_POINTS = [
+        'ringan' => 5,
+        'sedang' => 15,
+        'berat' => 50,
+    ];
+
     protected $fillable = [
         'name',
         'description',
@@ -18,6 +24,11 @@ class ViolationType extends Model
         'is_active' => 'boolean',
         'points' => 'integer',
     ];
+
+    public static function pointsForCategory(string $category): int
+    {
+        return self::CATEGORY_POINTS[$category];
+    }
 
     public function getCategoryLabelAttribute(): string
     {

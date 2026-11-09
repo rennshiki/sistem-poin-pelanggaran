@@ -19,7 +19,7 @@
                 <div class="mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Formulir Jenis Pelanggaran</h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Isi data jenis pelanggaran beserta jumlah poin yang akan dikenakan kepada siswa.
+                        Poin ditentukan otomatis berdasarkan kategori pelanggaran.
                     </p>
                 </div>
 
@@ -43,18 +43,7 @@
                         <x-input-error :messages="$errors->get('description')" class="mt-2" />
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {{-- Poin --}}
-                        <div>
-                            <x-input-label for="points" :value="__('Jumlah Poin')" />
-                            <x-text-input id="points" class="block mt-1 w-full" type="number" name="points"
-                                :value="old('points', 1)" required min="1" max="100" />
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Poin yang diberikan saat pelanggaran ini dicatat (1–100).</p>
-                            <x-input-error :messages="$errors->get('points')" class="mt-2" />
-                        </div>
-
-                        {{-- Kategori --}}
-                        <div>
+                    <div>
                             <x-input-label for="category" :value="__('Kategori Pelanggaran')" />
                             <select id="category" name="category" required
                                 class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
@@ -64,7 +53,7 @@
                                 <option value="berat"  @selected(old('category') === 'berat')>🔴 Berat</option>
                             </select>
                             <x-input-error :messages="$errors->get('category')" class="mt-2" />
-                        </div>
+                            <p class="mt-2 text-sm text-slate-600">Poin kategori: <strong id="category_points" class="text-blue-700">Pilih kategori</strong></p>
                     </div>
 
                     {{-- Status Aktif --}}
@@ -91,5 +80,17 @@
             </div>
         </div>
     </div>
+    <script>
+        const categoryPoints = { ringan: 5, sedang: 15, berat: 50 };
+        const categorySelect = document.getElementById('category');
+        const pointsLabel = document.getElementById('category_points');
+        function updateCategoryPoints() {
+            pointsLabel.textContent = categoryPoints[categorySelect.value]
+                ? categoryPoints[categorySelect.value] + ' poin'
+                : 'Pilih kategori';
+        }
+        categorySelect.addEventListener('change', updateCategoryPoints);
+        updateCategoryPoints();
+    </script>
 </x-app-layout>
 

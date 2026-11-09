@@ -36,30 +36,38 @@
                         @error('student_id')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
                     </div>
 
-                    {{-- Jenis Pelanggaran --}}
+                    {{-- Kategori dan Jenis Pelanggaran --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Pelanggaran</label>
-                        <select name="violation_type_id" id="vt_select" required
+                        <label for="category_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori Pelanggaran</label>
+                        <select name="category" id="category_select" required
                             class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                            <option value="">-- Pilih Jenis Pelanggaran --</option>
-                            @foreach ($violationTypes->groupBy('category') as $cat => $types)
-                                <optgroup label="{{ ucfirst($cat) }}">
-                                    @foreach ($types as $vt)
-                                        <option value="{{ $vt->id }}" data-points="{{ $vt->points }}"
-                                            @selected(old('violation_type_id') == $vt->id)>
-                                            {{ $vt->name }} ({{ $vt->points }} poin)
-                                        </option>
-                                    @endforeach
-                                </optgroup>
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="ringan" @selected(old('category') === 'ringan')>Ringan — 5 poin</option>
+                            <option value="sedang" @selected(old('category') === 'sedang')>Sedang — 15 poin</option>
+                            <option value="berat" @selected(old('category') === 'berat')>Berat — 50 poin</option>
+                        </select>
+                        @error('category')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div>
+                        <label for="vt_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Pelanggaran</label>
+                        <select name="violation_type_id" id="vt_select" required disabled
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:cursor-not-allowed disabled:opacity-60">
+                            <option value="">-- Pilih kategori terlebih dahulu --</option>
+                            @foreach ($violationTypes as $vt)
+                                <option value="{{ $vt->id }}" data-category="{{ $vt->category }}"
+                                    @selected(old('violation_type_id') == $vt->id)>
+                                    {{ $vt->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('violation_type_id')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
 
-                        <div id="pts_preview" class="hidden mt-2 px-4 py-2.5 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg flex items-center gap-2">
+                        <div id="pts_preview" class="hidden mt-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2">
                             <svg class="w-4 h-4 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                             </svg>
-                            <span class="text-sm text-orange-700 dark:text-orange-300">
+                            <span class="text-sm text-blue-700">
                                 Poin ditambahkan: <strong id="pts_val" class="text-lg">0</strong>
                             </span>
                         </div>
@@ -113,14 +121,35 @@
     </div>
 
     <script>
+        const categorySelect = document.getElementById('category_select');
         const sel = document.getElementById('vt_select');
         const preview = document.getElementById('pts_preview');
         const val = document.getElementById('pts_val');
-        sel.addEventListener('change', function () {
-            const pts = this.options[this.selectedIndex].dataset.points;
-            if (pts) { val.textContent = pts; preview.classList.remove('hidden'); }
-            else preview.classList.add('hidden');
-        });
+        const oldViolationType = @json(old('violation_type_id'));
+        const categoryPoints = { ringan: 5, sedang: 15, berat: 50 };
+
+        function filterViolationTypes() {
+            const category = categorySelect.value;
+            let selectedTypeIsVisible = false;
+
+            Array.from(sel.options).slice(1).forEach(function (option) {
+                const isVisible = category !== '' && option.dataset.category === category;
+                option.hidden = !isVisible;
+                option.disabled = !isVisible;
+                if (isVisible && option.value === sel.value) selectedTypeIsVisible = true;
+            });
+
+            sel.disabled = category === '';
+            if (!selectedTypeIsVisible) sel.value = '';
+            sel.options[0].textContent = category ? '-- Pilih Nama Pelanggaran --' : '-- Pilih kategori terlebih dahulu --';
+            val.textContent = categoryPoints[category] ?? '0';
+            preview.classList.toggle('hidden', category === '');
+        }
+
+        categorySelect.addEventListener('change', filterViolationTypes);
+        sel.addEventListener('change', filterViolationTypes);
+        if (oldViolationType) sel.value = String(oldViolationType);
+        filterViolationTypes();
     </script>
 </x-app-layout>
 
