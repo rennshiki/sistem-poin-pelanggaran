@@ -10,7 +10,7 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Username / NIP / NISN -->
+        <!-- / NIP / NISN -->
         <div>
             <x-input-label for="login" :value="__('NIP / NISN')" />
 

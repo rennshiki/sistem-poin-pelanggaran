@@ -41,8 +41,8 @@
                         <span>100</span>
                     </div>
                     <div class="h-5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden relative">
-                        <div class="h-full bg-{{ $barColor }}-500 rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
-                             style="width: {{ max(2, $percentage) }}%">
+                        <div class="h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
+                             style="width: {{ max(2, $percentage) }}%; background-color: {{ match ($barColor) { 'rose' => '#f43f5e', 'amber' => '#f59e0b', 'orange' => '#f97316', default => '#10b981' } }}">
                             @if ($percentage > 15)
                                 <span class="text-white text-xs font-bold">{{ $totalPoints }}</span>
                             @endif

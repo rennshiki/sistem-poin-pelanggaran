@@ -19,9 +19,13 @@
     </div>
 
     <div class="border-b border-slate-100 px-6 py-6 text-center">
-        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-xl font-bold text-blue-700">
-            {{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}
-        </div>
+        @if (Auth::user()->profile_photo_path)
+            <img src="{{ route('profile.photo', Auth::user()) }}" alt="Foto profil {{ Auth::user()->name }}" class="mx-auto h-14 w-14 rounded-2xl object-cover ring-2 ring-blue-100">
+        @else
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-xl font-bold text-blue-700">
+                {{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}
+            </div>
+        @endif
         <p class="mt-3 truncate text-sm font-bold text-slate-900">{{ Auth::user()->name }}</p>
         <p class="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{{ Auth::user()->role }}</p>
     </div>

@@ -24,11 +24,22 @@
                     </p>
                 </div>
 
-                <form method="POST" action="{{ $isEditing ? route('admin.students.update', $student) : route('admin.students.store') }}" class="space-y-6">
+                <form method="POST" action="{{ $isEditing ? route('admin.students.update', $student) : route('admin.students.store') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @if ($isEditing)
                         @method('PUT')
                     @endif
+
+                    <div>
+                        <x-input-label for="profile_photo" value="Foto Profil Siswa (opsional)" />
+                        @if ($isEditing && $student->user?->profile_photo_path)
+                            <img src="{{ route('profile.photo', $student->user) }}" alt="Foto profil {{ $student->user?->name }}" class="mb-3 mt-2 h-20 w-20 rounded-xl object-cover ring-1 ring-slate-200">
+                        @endif
+                        <input id="profile_photo" type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp"
+                            class="mt-2 block w-full rounded-lg border border-slate-300 bg-white text-sm text-slate-700 file:mr-4 file:border-0 file:bg-slate-100 file:px-4 file:py-2.5 file:font-medium hover:file:bg-slate-200">
+                        <p class="mt-1 text-xs text-slate-500">Format JPG, PNG, atau WEBP. Maksimal 5 MB. Saat edit, kosongkan jika foto tidak diganti.</p>
+                        <x-input-error :messages="$errors->get('profile_photo')" class="mt-2" />
+                    </div>
 
                     <!-- Nama Siswa -->
                     <div>

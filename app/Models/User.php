@@ -17,6 +17,7 @@ use Illuminate\Notifications\Notifiable;
     'role',
     'is_active',
     'password',
+    'profile_photo_path',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable

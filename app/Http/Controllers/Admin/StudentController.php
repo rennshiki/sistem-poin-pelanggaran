@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -54,15 +55,19 @@ class StudentController extends Controller
             'major' => ['required', 'string', 'max:100'],
             'parent_phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:6'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $photoPath = $request->file('profile_photo')?->store('profile-photos', 'public');
+
+        DB::transaction(function () use ($validated, $photoPath) {
             $user = User::create([
                 'name' => $validated['name'],
                 'nisn' => $validated['nisn'],
                 'role' => 'siswa',
                 'password' => $validated['password'],
                 'is_active' => true,
+                'profile_photo_path' => $photoPath,
             ]);
 
             Student::create([
@@ -86,9 +91,13 @@ class StudentController extends Controller
             'major' => ['required', 'string', 'max:100'],
             'parent_phone' => ['required', 'string', 'max:20'],
             'password' => ['nullable', 'string', 'min:6'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        DB::transaction(function () use ($validated, $student) {
+        $oldPhotoPath = $student->user?->profile_photo_path;
+        $photoPath = $request->file('profile_photo')?->store('profile-photos', 'public');
+
+        DB::transaction(function () use ($validated, $student, $photoPath) {
             $student->update([
                 'class' => $validated['class'],
                 'major' => $validated['major'],
@@ -103,9 +112,16 @@ class StudentController extends Controller
             if (! empty($validated['password'])) {
                 $userChanges['password'] = $validated['password'];
             }
+            if ($photoPath) {
+                $userChanges['profile_photo_path'] = $photoPath;
+            }
 
             $student->user->update($userChanges);
         });
+
+        if ($photoPath && $oldPhotoPath) {
+            Storage::disk('public')->delete($oldPhotoPath);
+        }
 
         return redirect()->route('admin.students.index')
             ->with('success', 'Data siswa berhasil diperbarui.');
@@ -113,6 +129,8 @@ class StudentController extends Controller
 
     public function destroy(Student $student): RedirectResponse
     {
+        $photoPath = $student->user?->profile_photo_path;
+
         DB::transaction(function () use ($student) {
             $user = $student->user;
 
@@ -122,6 +140,10 @@ class StudentController extends Controller
                 $student->delete();
             }
         });
+
+        if ($photoPath) {
+            Storage::disk('public')->delete($photoPath);
+        }
 
         return redirect()->route('admin.students.index')
             ->with('success', 'Data siswa dan akun loginnya berhasil dihapus.');
