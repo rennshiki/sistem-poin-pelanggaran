@@ -23,16 +23,46 @@
                     </p>
                 </div>
 
-                <form method="POST" action="{{ route('guru.violations.store', ['student_id' => $selectedStudent->id]) }}" enctype="multipart/form-data" class="space-y-6">
+                <form id="violation-form" method="POST" action="{{ route('guru.violations.store') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     {{-- Siswa --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pilih Siswa</label>
-                        <input type="hidden" name="student_id" value="{{ $selectedStudent->id }}">
-                        <div class="rounded-md border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                            {{ $selectedStudent->user?->name }} &mdash; Kelas {{ $selectedStudent->class }} ({{ $selectedStudent->major }})
+                        <label for="student_search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cari Nama Siswa</label>
+                        <input type="search" id="student_search" name="student_search" autocomplete="off"
+                            value="{{ old('student_search', $selectedStudent?->user?->name ?? '') }}"
+                            placeholder="Ketik nama atau NISN siswa..."
+                            aria-controls="student_search_results" aria-expanded="false"
+                            class="block w-full rounded-lg border-gray-300 bg-white text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+                        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="student_class" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Kelas</label>
+                                <select id="student_class" name="student_class" class="block w-full rounded-lg border-gray-300 bg-white text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <option value="">Semua Kelas</option>
+                                    @foreach ($classes as $class)
+                                        <option value="{{ $class }}" @selected(old('student_class', $selectedStudent?->class) === $class)>{{ $class }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="student_major" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Jurusan</label>
+                                <select id="student_major" name="student_major" class="block w-full rounded-lg border-gray-300 bg-white text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <option value="">Semua Jurusan</option>
+                                </select>
+                            </div>
                         </div>
+
+                        <input type="hidden" name="student_id" id="student_id" value="{{ old('student_id', $selectedStudent?->id ?? '') }}">
+                        <div id="student_search_results" class="mt-2 hidden max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg" role="listbox" aria-label="Hasil pencarian siswa"></div>
+                        <p id="student_picker_status" class="mt-2 text-xs text-slate-500" aria-live="polite">
+                            @if ($selectedStudent)
+                                Siswa terpilih: {{ $selectedStudent->user?->name }} — Kelas {{ $selectedStudent->class }}, {{ $selectedStudent->major }}.
+                            @else
+                                Cari dan pilih nama siswa dari hasil pencarian.
+                            @endif
+                        </p>
+                        <p id="student_picker_error" class="mt-1 hidden text-xs text-rose-600">Pilih siswa dari hasil pencarian sebelum menyimpan.</p>
                         @error('student_id')<p class="text-xs text-rose-500 mt-1">{{ $message }}</p>@enderror
                     </div>
 
@@ -121,6 +151,130 @@
     </div>
 
     <script>
+        const studentSearch = document.getElementById('student_search');
+        const studentClass = document.getElementById('student_class');
+        const studentMajor = document.getElementById('student_major');
+        const studentId = document.getElementById('student_id');
+        const studentResults = document.getElementById('student_search_results');
+        const studentStatus = document.getElementById('student_picker_status');
+        const studentPickerError = document.getElementById('student_picker_error');
+        const studentForm = document.getElementById('violation-form');
+        const students = @js($students->map(fn ($student) => [
+            'id' => (string) $student->id,
+            'name' => $student->user?->name ?? '',
+            'nisn' => $student->user?->nisn ?? '',
+            'class' => $student->class ?? '',
+            'major' => $student->major ?? '',
+        ])->values());
+        const majorsByClass = @js($majorsByClass);
+        const initialMajor = @js(old('student_major', $selectedStudent?->major));
+        let selectedStudentName = @js($selectedStudent?->user?->name ?? '');
+
+        function updateMajors(preferredMajor = '') {
+            const className = studentClass.value;
+            const majors = className
+                ? (majorsByClass[className] || [])
+                : [...new Set(Object.values(majorsByClass).flat())].sort();
+            const currentMajor = preferredMajor || studentMajor.value;
+            studentMajor.replaceChildren(new Option('Semua Jurusan', ''));
+            majors.forEach(function (major) {
+                studentMajor.add(new Option(major, major));
+            });
+            studentMajor.value = majors.includes(currentMajor) ? currentMajor : '';
+        }
+
+        function renderStudentResults() {
+            const query = studentSearch.value.trim().toLocaleLowerCase();
+            const className = studentClass.value;
+            const major = studentMajor.value;
+            const selected = students.find(student => student.id === studentId.value);
+
+            if (selected && (studentSearch.value.trim() !== selectedStudentName || (className && className !== selected.class) || (major && major !== selected.major))) {
+                studentId.value = '';
+                selectedStudentName = '';
+            }
+
+            const matches = students.filter(function (student) {
+                const searchable = `${student.name} ${student.nisn} ${student.class} ${student.major}`.toLocaleLowerCase();
+                return (!query || searchable.includes(query))
+                    && (!className || student.class === className)
+                    && (!major || student.major === major);
+            }).slice(0, 20);
+
+            studentResults.replaceChildren();
+            if (studentId.value) {
+                studentResults.classList.add('hidden');
+                const current = students.find(student => student.id === studentId.value);
+                studentStatus.textContent = current ? `Siswa terpilih: ${current.name} — Kelas ${current.class}, ${current.major}.` : 'Cari dan pilih nama siswa dari hasil pencarian.';
+                studentSearch.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            studentStatus.textContent = 'Cari dan pilih nama siswa dari hasil pencarian.';
+            if (!query && !className && !major) {
+                studentResults.classList.add('hidden');
+                studentSearch.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            if (!matches.length) {
+                const empty = document.createElement('p');
+                empty.className = 'px-3 py-3 text-sm text-slate-500';
+                empty.textContent = 'Siswa tidak ditemukan.';
+                studentResults.appendChild(empty);
+            } else {
+                matches.forEach(function (student) {
+                    const result = document.createElement('button');
+                    result.type = 'button';
+                    result.role = 'option';
+                    result.className = 'block w-full border-b border-slate-100 px-3 py-2.5 text-left text-sm text-slate-700 last:border-0 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none';
+                    result.textContent = `${student.name} — ${student.nisn} · Kelas ${student.class} · ${student.major}`;
+                    result.addEventListener('click', function () {
+                        studentId.value = student.id;
+                        selectedStudentName = student.name;
+                        studentSearch.value = student.name;
+                        studentClass.value = student.class;
+                        updateMajors(student.major);
+                        studentPickerError.classList.add('hidden');
+                        renderStudentResults();
+                    });
+                    studentResults.appendChild(result);
+                });
+            }
+
+            studentResults.classList.remove('hidden');
+            studentSearch.setAttribute('aria-expanded', 'true');
+        }
+
+        updateMajors(initialMajor || '');
+        studentSearch.addEventListener('input', function () {
+            if (studentId.value && this.value.trim() !== selectedStudentName) studentId.value = '';
+            renderStudentResults();
+        });
+        studentClass.addEventListener('change', function () {
+            if (studentId.value) studentId.value = '';
+            updateMajors();
+            renderStudentResults();
+        });
+        studentMajor.addEventListener('change', function () {
+            if (studentId.value) studentId.value = '';
+            renderStudentResults();
+        });
+        document.addEventListener('click', function (event) {
+            if (!studentResults.contains(event.target) && event.target !== studentSearch) {
+                studentResults.classList.add('hidden');
+                studentSearch.setAttribute('aria-expanded', 'false');
+            }
+        });
+        studentForm.addEventListener('submit', function (event) {
+            if (!studentId.value) {
+                event.preventDefault();
+                studentPickerError.classList.remove('hidden');
+                studentSearch.focus();
+            }
+        });
+        renderStudentResults();
+
         const categorySelect = document.getElementById('category_select');
         const sel = document.getElementById('vt_select');
         const preview = document.getElementById('pts_preview');

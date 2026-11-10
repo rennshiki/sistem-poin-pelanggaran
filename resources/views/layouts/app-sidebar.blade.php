@@ -66,12 +66,6 @@
                     </svg>
                     Catat Pelanggaran
                 </a>
-                <a href="{{ route('guru.violations.index') }}" class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm transition {{ request()->routeIs('guru.violations.index') ? 'bg-blue-50 font-semibold text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
-                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-                    </svg>
-                    Riwayat Catatan
-                </a>
             @endif
         </nav>
     </div>

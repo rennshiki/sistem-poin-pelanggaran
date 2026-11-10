@@ -17,7 +17,7 @@ class ViolationController extends Controller
     {
         $search = $request->query('search');
 
-        $students = Student::with('user')
+        $students = Student::with(['user', 'violations'])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->whereHas('user', function ($userQuery) use ($search) {
@@ -28,25 +28,43 @@ class ViolationController extends Controller
                     ->orWhere('major', 'like', "%{$search}%");
                 });
             })
+            ->whereHas('violations')
+            ->withSum('violations as total_points', 'points')
+            ->withCount('violations')
             ->orderBy('created_at')
             ->orderBy('id')
             ->paginate(10)
             ->withQueryString();
 
-        return view('teachers.violations.students', compact('students', 'search'));
+        $teacher = auth()->user()->teacher;
+        $violations = Violation::with(['student.user', 'violationType'])
+            ->where('teacher_id', $teacher?->id)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->whereHas('student.user', fn ($studentQuery) => $studentQuery->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('violationType', fn ($typeQuery) => $typeQuery->where('name', 'like', "%{$search}%"));
+                });
+            })
+            ->latest('violation_date')
+            ->paginate(10, ['*'], 'history_page')
+            ->withQueryString();
+
+        return view('teachers.violations.students', compact('students', 'violations', 'search'));
     }
 
     public function create(Request $request): View
     {
         $studentId = $request->query('student_id', old('student_id'));
-        if (! $studentId) {
-            return redirect()->route('guru.violations.students');
-        }
-
-        $selectedStudent = Student::with('user')->findOrFail($studentId);
+        $students = Student::with('user')->orderBy('class')->orderBy('major')->get();
+        $selectedStudent = $studentId ? $students->firstWhere('id', (int) $studentId) : null;
+        abort_if($studentId && ! $selectedStudent, 404);
+        $classes = $students->pluck('class')->filter()->unique()->sort()->values();
+        $majorsByClass = $students->groupBy('class')
+            ->map(fn ($group) => $group->pluck('major')->filter()->unique()->sort()->values())
+            ->all();
         $violationTypes = ViolationType::active()->orderBy('category')->orderBy('name')->get();
 
-        return view('teachers.violations.create', compact('violationTypes', 'selectedStudent'));
+        return view('teachers.violations.create', compact('students', 'classes', 'majorsByClass', 'violationTypes', 'selectedStudent'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -92,22 +110,9 @@ class ViolationController extends Controller
             ->with('success', 'Pelanggaran siswa berhasil dicatat.');
     }
 
-    public function index(Request $request): View
+    public function index(Request $request): RedirectResponse
     {
-        $teacher = auth()->user()->teacher;
-        $search  = $request->query('search');
-
-        $violations = Violation::with(['student.user', 'violationType'])
-            ->where('teacher_id', $teacher?->id)
-            ->when($search, function ($q) use ($search) {
-                $q->whereHas('student.user', fn($sq) => $sq->where('name', 'like', "%{$search}%"))
-                  ->orWhereHas('violationType', fn($vq) => $vq->where('name', 'like', "%{$search}%"));
-            })
-            ->latest('violation_date')
-            ->paginate(15)
-            ->withQueryString();
-
-        return view('teachers.violations.index', compact('violations', 'search'));
+        return redirect()->route('guru.violations.students', $request->query());
     }
 
     public function photo(Violation $violation)

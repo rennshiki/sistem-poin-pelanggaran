@@ -69,40 +69,19 @@
                 {{-- ===================== DAFTAR SISWA + POIN ===================== --}}
                 <div class="lg:col-span-5 space-y-5">
 
-                    {{-- Pelanggaran Terbaru --}}
-                    @if ($recentViolations->isNotEmpty())
-                    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Catatan Terbaru Anda</h3>
-                            <a href="{{ route('guru.violations.index') }}" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Lihat semua →</a>
-                        </div>
-                        <div class="space-y-2">
-                            @foreach ($recentViolations as $v)
-                                <div class="flex items-start justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 gap-3">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $v->student->user?->name }}</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $v->violationType->name }}</p>
-                                        @if ($v->notes)
-                                            <p class="text-xs text-gray-400 italic truncate">{{ $v->notes }}</p>
-                                        @endif
-                                    </div>
-                                    <div class="text-right shrink-0">
-                                        <span class="inline-block px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-bold rounded">
-                                            +{{ $v->points }} poin
-                                        </span>
-                                        <p class="text-xs text-gray-400 mt-1">{{ $v->violation_date->format('d M Y') }}</p>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
                     {{-- Daftar Siswa + Bar Poin --}}
                     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Akumulasi Poin Semua Siswa</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Klik "Catat" untuk mencatat pelanggaran siswa tersebut.</p>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Siswa dengan Catatan Pelanggaran</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Daftar awal hanya menampilkan siswa yang pernah dilaporkan. Cari siswa lain untuk membuat catatan baru.</p>
+                            <form method="GET" action="{{ route('guru.dashboard') }}" class="mt-4 flex flex-col gap-3 sm:flex-row">
+                                <input type="search" name="search" value="{{ $search }}" placeholder="Cari nama, NISN, kelas, atau jurusan siswa..."
+                                    class="w-full flex-1 rounded-lg border border-slate-300 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500">
+                                <button type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">Cari Siswa</button>
+                                @if ($search)
+                                    <a href="{{ route('guru.dashboard') }}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Reset</a>
+                                @endif
+                            </form>
                         </div>
                         <div class="divide-y divide-gray-100 dark:divide-gray-700">
                             @forelse ($students as $student)
@@ -145,7 +124,7 @@
                                 </div>
                             @empty
                                 <div class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    Belum ada data siswa terdaftar.
+                                    {{ $search ? 'Siswa tidak ditemukan.' : 'Belum ada siswa dengan catatan pelanggaran.' }}
                                 </div>
                             @endforelse
                         </div>
