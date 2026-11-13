@@ -102,7 +102,7 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center gap-2">
                                             <a href="{{ route('admin.students.edit', $student) }}" class="rounded-lg bg-sky-100 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-200">Edit</a>
-                                            <form method="POST" action="{{ route('admin.students.destroy', $student) }}" data-confirm="{{ 'Hapus siswa ' . ($student->user?->name ?? '') . '? Data dan seluruh riwayat pelanggarannya juga akan dihapus.' }}" onsubmit="return confirm(this.dataset.confirm)">
+                                            <form method="POST" action="{{ route('admin.students.destroy', $student) }}" data-confirm="{{ 'Hapus siswa ' . ($student->user?->name ?? '') . '? Data dan seluruh riwayat pelanggarannya juga akan dihapus.' }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="rounded-lg bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-200">Hapus</button>
@@ -135,4 +135,5 @@
             </div>
         </div>
     </div>
+    <x-delete-confirmation-modal />
 </x-app-layout>

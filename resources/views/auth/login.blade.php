@@ -32,14 +32,32 @@
         <div class="mt-4">
             <x-input-label for="password" value="Kata sandi" />
 
-            <x-text-input
-                id="password"
-                class="mt-2 block w-full"
-                type="password"
-                name="password"
-                required
-                autocomplete="current-password"
-            />
+            <div class="relative mt-2">
+                <x-text-input
+                    id="password"
+                    class="block w-full pe-12"
+                    type="password"
+                    name="password"
+                    required
+                    autocomplete="current-password"
+                />
+                <button
+                    type="button"
+                    id="toggle-password-visibility"
+                    class="absolute inset-y-0 end-0 inline-flex items-center px-4 text-slate-500 transition hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset"
+                    aria-label="Tampilkan kata sandi"
+                    aria-controls="password"
+                    aria-pressed="false"
+                >
+                    <svg id="password-eye-icon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.5-7 9.75-7 9.75 7 9.75 7-3.5 7-9.75 7-9.75-7-9.75-7Z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <svg id="password-eye-off-icon" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m3 3 18 18M10.58 10.59a2 2 0 0 0 2.83 2.83M9.88 5.24A10.8 10.8 0 0 1 12 5c6.25 0 9.75 7 9.75 7a17.4 17.4 0 0 1-3.13 3.92M6.61 6.61C3.78 8.43 2.25 12 2.25 12s3.5 7 9.75 7a10.6 10.6 0 0 0 5.39-1.48" />
+                    </svg>
+                </button>
+            </div>
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
@@ -66,4 +84,20 @@
             </x-primary-button>
         </div>
     </form>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('toggle-password-visibility');
+        const passwordEyeIcon = document.getElementById('password-eye-icon');
+        const passwordEyeOffIcon = document.getElementById('password-eye-off-icon');
+
+        passwordToggle.addEventListener('click', function () {
+            const isVisible = passwordInput.type === 'text';
+            passwordInput.type = isVisible ? 'password' : 'text';
+            passwordToggle.setAttribute('aria-pressed', String(!isVisible));
+            passwordToggle.setAttribute('aria-label', isVisible ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi');
+            passwordEyeIcon.classList.toggle('hidden', !isVisible);
+            passwordEyeOffIcon.classList.toggle('hidden', isVisible);
+        });
+    </script>
 </x-guest-layout>

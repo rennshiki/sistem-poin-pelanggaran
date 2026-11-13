@@ -199,7 +199,7 @@
                 return (!query || searchable.includes(query))
                     && (!className || student.class === className)
                     && (!major || student.major === major);
-            }).slice(0, 20);
+            });
 
             studentResults.replaceChildren();
             if (studentId.value) {
@@ -218,12 +218,21 @@
             }
 
             if (!matches.length) {
+                const heading = document.createElement('div');
+                heading.className = 'border-b border-slate-100 bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500';
+                heading.textContent = 'Pilihan Siswa';
+                studentResults.appendChild(heading);
                 const empty = document.createElement('p');
                 empty.className = 'px-3 py-3 text-sm text-slate-500';
-                empty.textContent = 'Siswa tidak ditemukan.';
+                empty.textContent = 'Tidak ada siswa yang cocok dengan nama, kelas, dan jurusan yang dipilih.';
                 studentResults.appendChild(empty);
             } else {
-                matches.forEach(function (student) {
+                const heading = document.createElement('div');
+                heading.className = 'sticky top-0 border-b border-slate-100 bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500';
+                heading.textContent = `Pilihan Siswa (${matches.length}${matches.length > 20 ? ', menampilkan 20 pertama' : ''})`;
+                studentResults.appendChild(heading);
+
+                matches.slice(0, 20).forEach(function (student) {
                     const result = document.createElement('button');
                     result.type = 'button';
                     result.role = 'option';
@@ -252,16 +261,31 @@
             renderStudentResults();
         });
         studentClass.addEventListener('change', function () {
-            if (studentId.value) studentId.value = '';
+            if (studentId.value) {
+                studentId.value = '';
+                selectedStudentName = '';
+            }
             updateMajors();
             renderStudentResults();
         });
         studentMajor.addEventListener('change', function () {
-            if (studentId.value) studentId.value = '';
+            if (studentId.value) {
+                studentId.value = '';
+                selectedStudentName = '';
+            }
             renderStudentResults();
         });
+        [studentClass, studentMajor].forEach(function (filter) {
+            filter.addEventListener('click', renderStudentResults);
+            filter.addEventListener('focus', renderStudentResults);
+        });
         document.addEventListener('click', function (event) {
-            if (!studentResults.contains(event.target) && event.target !== studentSearch) {
+            const clickedStudentPicker = studentResults.contains(event.target)
+                || event.target === studentSearch
+                || studentClass.contains(event.target)
+                || studentMajor.contains(event.target);
+
+            if (!clickedStudentPicker) {
                 studentResults.classList.add('hidden');
                 studentSearch.setAttribute('aria-expanded', 'false');
             }
